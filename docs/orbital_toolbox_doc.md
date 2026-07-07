@@ -1,106 +1,83 @@
-
 # Orbital Toolbox Documentation
 
 ## Overview
 
-This toolbox provides tools for orbital mechanics including:
+This toolbox provides educational tools for foundational orbital mechanics,
+including:
 
-- COE ↔ RV conversion
-- Orbit propagation
-- Impulsive maneuvers
-- Pure inclination-change burn calculation
-- Transfer analysis, currently Hohmann transfer
-- Validation and visualization
+- COE <-> RV conversion
+- two-body orbit propagation
+- impulsive maneuvers
+- pure inclination-change burn calculation
+- Hohmann transfer analysis
+- validation and visualization
 
 ---
 
 ## Assumptions
 
 - Two-body gravity
+- Point-mass central body
+- Impulsive burns
+- Fixed timestep propagation
 - Units:
   - Distance: km
   - Velocity: km/s
   - Time: seconds
-  - Angles: radians internally, degrees for output/display
+  - Angles: radians internally, degrees for display/output
 
 ---
 
 ## File Structure
 
-read_me.md  
-Short project overview, quick-start instructions, current capabilities, and roadmap.
-
-constants.py  
-Stores physical constants such as gravitational parameters and body radii.
-
-orbital_elements.py  
-COE ↔ RV conversions and perifocal transformations, and ascending/descending node state calculations.
-
-rotations.py  
-Rotation matrices and frame transformations.
-
-integrators.py  
-Numerical integrators, currently Euler and RK4.
-
-dynamics.py  
-Acceleration models, currently two-body gravity.
-
-propagate.py  
-Orbit propagation and history tracking.
-
-maneuvers.py  
-Impulsive burns, direction vectors, and inclination-change calculations.
-
-transfers.py  
-Transfer calculations, currently Hohmann transfer.
-
-diagnostics.py  
-Error calculations and formatted summaries.
-
-plotting.py  
-Visualization utilities for single-orbit results and comparison results.
-
-validation.py  
-Verification tests for correctness. This file can be run directly as the toolbox health check.
-
-docs/  
-Technical documentation for the toolbox.
-
-docs/Orbital_Toolbox_Docs.md  
-Detailed documentation covering assumptions, equations, workflows, validation, limitations, and planned extensions.
-
-examples/  
-Polished demonstration scripts for toolbox features. Currently reserved for future examples.
-
-scratch/  
-Temporary experiments, throwaway tests, and sandbox scripts. Code in this folder is not considered part of the stable toolbox.
-
-tests/  
-Future automated test files.
+- `README.md`: public project overview, capabilities, assumptions, validation command, and examples.
+- `constants.py`: physical constants such as gravitational parameters and body radii.
+- `orbital_elements.py`: COE <-> RV conversions, perifocal transformations, and ascending/descending node state calculations.
+- `rotations.py`: rotation matrices and frame transformations.
+- `integrators.py`: numerical integrators, currently Euler and RK4.
+- `dynamics.py`: acceleration models, currently two-body gravity.
+- `propagate.py`: orbit propagation and history tracking.
+- `maneuvers.py`: impulsive burns, direction vectors, and inclination-change calculations.
+- `transfers.py`: transfer calculations, currently Hohmann transfer.
+- `diagnostics.py`: error calculations and formatted summaries.
+- `plotting.py`: visualization utilities for single-orbit results and comparison results.
+- `validation.py`: verification checks for core toolbox behavior. This file can be run directly as the toolbox health check.
+- `docs/`: technical documentation and learning summaries.
+- `examples/`: demonstration scripts for public-facing toolbox features.
 
 ---
 
 ## Core Workflows
 
-### COE → RV
+### COE to RV
 
-COE → perifocal state → ECI rotation → r_vec, v_vec
+```text
+COE -> perifocal state -> ECI rotation -> r_vec, v_vec
+```
 
 ### Propagation
 
-r_vec, v_vec → integrator → time history → final state
+```text
+r_vec, v_vec -> integrator -> time history -> final state
+```
 
 ### Maneuver
 
-direction → delta-v vector → new state → propagate
+```text
+direction -> delta-v vector -> new state -> propagate
+```
 
 For a pure inclination-change calculation:
 
-r_vec, v_vec, i_initial, i_final → rotated velocity vector → delta-v vector and magnitude
+```text
+r_vec, v_vec, i_initial, i_final -> rotated velocity vector -> delta-v vector and magnitude
+```
 
 ### Transfer
 
-r1, r2 → transfer design → delta-v values → maneuver → propagation → validation
+```text
+r1, r2 -> transfer design -> delta-v values -> maneuver -> propagation -> validation
+```
 
 ---
 
@@ -108,7 +85,9 @@ r1, r2 → transfer design → delta-v values → maneuver → propagation → v
 
 The toolbox follows a consistent data flow:
 
-COE → RV → Propagation → Diagnostics → Visualization
+```text
+COE -> RV -> Propagation -> Diagnostics -> Visualization
+```
 
 - Orbital elements are converted into Cartesian state vectors.
 - State vectors are propagated over time using numerical integrators.
@@ -123,55 +102,31 @@ COE → RV → Propagation → Diagnostics → Visualization
 - Low-level functions remain flexible and reusable.
 - Higher-level validation functions combine lower-level tools into complete checks.
 - Interchangeable integrators allow Euler and RK4 comparison.
-- Clear unit consistency: km, km/s, seconds.
+- Unit consistency is explicit: km, km/s, seconds.
 - Functions are designed for reuse and extension.
 
 ---
 
 ## Key Functions
 
-propagate_orbit  
-Core propagation wrapper. Advances a state vector using one selected integrator and records history.
-
-two_body_propagation_euler_rk4  
-Comparison wrapper that propagates the same state using Euler and RK4.
-
-rk4_orbit_step  
-Fourth-order Runge-Kutta integrator used for accurate orbit propagation.
-
-euler_orbit_step  
-Forward Euler integrator used mainly for comparison.
-
-two_body_acceleration  
-Computes gravitational acceleration using the two-body model.
-
-orbital_elements_from_rv  
-Computes orbital elements from position and velocity vectors. Also returns ascending and descending node true anomalies,
-position vectors, and velocity vectors when the nodes are defined.
-
-coe_to_rv  
-Converts classical orbital elements into Cartesian position and velocity vectors.
-
-apply_impulsive_delta_v  
-Applies an instantaneous velocity change to a state vector.
-
-prograde_unit, radial_unit, normal_unit  
-Generate common burn-direction unit vectors.
-
-inclination_change  
-Computes a pure plane-change burn by rotating the velocity vector about the current radius vector. Returns the delta-v vector, new velocity vector, delta-v magnitude, and scalar plane-change delta-v check.
-
-hohmann_transfer_requirements  
-Computes delta-v, transfer time, and related quantities for a Hohmann transfer.
-
-run_all_validations  
-Runs the full validation suite and reports pass/fail status.
+- `propagate_orbit`: core propagation wrapper. Advances a state vector using one selected integrator and records history.
+- `two_body_propagation_euler_rk4`: comparison wrapper that propagates the same state using Euler and RK4.
+- `rk4_orbit_step`: fourth-order Runge-Kutta integrator used for accurate orbit propagation.
+- `euler_orbit_step`: forward Euler integrator used mainly for comparison.
+- `two_body_acceleration`: computes gravitational acceleration using the two-body model.
+- `orbital_elements_from_rv`: computes orbital elements from position and velocity vectors. Also returns ascending and descending node true anomalies, position vectors, and velocity vectors when the nodes are defined.
+- `coe_to_rv`: converts classical orbital elements into Cartesian position and velocity vectors.
+- `apply_impulsive_delta_v`: applies an instantaneous velocity change to a state vector.
+- `prograde_unit`, `radial_unit`, `normal_unit`: generate common burn-direction unit vectors.
+- `inclination_change`: computes a pure plane-change burn by rotating the velocity vector about the current radius vector. Returns the delta-v vector, new velocity vector, delta-v magnitude, and scalar plane-change delta-v check.
+- `hohmann_transfer_requirements`: computes delta-v, transfer time, and related quantities for a Hohmann transfer.
+- `run_all_validations`: runs the full validation suite and reports pass/fail status.
 
 ---
 
 ## Current Capabilities
 
-- COE ↔ RV conversion
+- COE <-> RV conversion
 - Ascending and descending node true anomaly, position vector, and velocity vector calculation
 - Two-body orbit propagation
 - Euler and RK4 integrators
@@ -191,141 +146,176 @@ These equations summarize the main physics and numerical methods used throughout
 
 ### Two-Body Gravitational Acceleration
 
+```text
 a_vec = -mu * r_vec / |r_vec|^3
+```
 
 ### Specific Angular Momentum
 
-h_vec = r_vec × v_vec
-
+```text
+h_vec = r_vec x v_vec
 h = |h_vec|
-
 h_hat = h_vec / h
+```
 
 ### Node Vector
 
-n_vec = k_hat × h_vec
-
+```text
+n_vec = k_hat x h_vec
 n = |n_vec|
-
-The node vector points toward the ascending node.
-
 n_hat = n_vec / n
+```
 
-The descending node points in the opposite direction:
+The node vector points toward the ascending node. The descending node points in the opposite direction.
 
+```text
 r_hat_des = -n_hat
+```
 
 ### Eccentricity Vector
 
-e_vec = (1/mu) * ((v^2 - mu/r) * r_vec - (r_vec · v_vec) * v_vec)
-
+```text
+e_vec = (1/mu) * ((v^2 - mu/r) * r_vec - (r_vec dot v_vec) * v_vec)
 e = |e_vec|
+```
 
 ### Specific Orbital Energy
 
+```text
 epsilon = v^2 / 2 - mu / r
+```
 
 ### Semi-Major Axis
 
+```text
 a = -mu / (2 * epsilon)
+```
 
 ### Orbital Period
 
+```text
 T = 2 * pi * sqrt(a^3 / mu)
+```
 
 ### Perifocal Position
 
+```text
 p = a * (1 - e^2)
-
 r = p / (1 + e * cos(nu))
-
 r_pf = [r cos(nu), r sin(nu), 0]
+```
 
 ### Perifocal Velocity
 
+```text
 v_pf = sqrt(mu / p) * [-sin(nu), e + cos(nu), 0]
+```
 
 ### Ascending and Descending Nodes
 
 The argument of latitude is:
 
+```text
 u = omega + nu
+```
 
 At the ascending node:
 
+```text
 u = 0
-
 nu_asc = -omega
+```
 
 At the descending node:
 
+```text
 u = pi
-
 nu_des = pi - omega
+```
 
 The orbital radius at each node is found using:
 
-r = p / (1 + e cos(nu))
+```text
+r = p / (1 + e * cos(nu))
+```
 
 The ascending node position vector is:
 
+```text
 r_vec_asc = r_asc * n_hat
+```
 
 The descending node position vector is:
 
+```text
 r_vec_des = -r_des * n_hat
+```
 
 The velocity vector at a node can be written using radial and transverse components:
 
+```text
 v_vec = v_r * r_hat + v_theta * theta_hat
+```
 
 where:
 
+```text
 r_hat = r_vec / |r_vec|
-
-theta_hat = h_hat × r_hat
-
+theta_hat = h_hat x r_hat
 v_r = (mu / h) * e * sin(nu)
-
 v_theta = h / r
+```
 
 ### Euler Integration
 
+```text
 v_{n+1} = v_n + a_n * dt
-
 r_{n+1} = r_n + v_{n+1} * dt
+```
 
 ### Runge-Kutta 4
 
+```text
 y_{n+1} = y_n + (1/6)(k1 + 2k2 + 2k3 + k4)
+```
 
 ### Pure Inclination Change
 
-The inclination-change helper models an instantaneous plane-change burn at the current position.
-It rotates the velocity vector about the radius direction using Rodrigues' rotation formula.
+The inclination-change helper models an instantaneous plane-change burn at the current position. It rotates the velocity
+vector about the radius direction using Rodrigues' rotation formula.
 
+```text
 r_hat = r_vec / |r_vec|
-
 delta_i = i_final - i_initial
+```
 
+```text
 v_new =
-v cos(delta_i)
-+ (r_hat x v) sin(delta_i)
-+ r_hat (r_hat dot v) (1 - cos(delta_i))
+    v * cos(delta_i)
+    + (r_hat x v) * sin(delta_i)
+    + r_hat * (r_hat dot v) * (1 - cos(delta_i))
+```
 
+```text
 delta_v_vec = v_new - v
-
 delta_v_mag = |delta_v_vec|
+```
 
 For a pure plane change that preserves speed, the scalar check is:
 
-delta_v = 2 v sin(|delta_i| / 2)
+```text
+delta_v = 2 * v * sin(|delta_i| / 2)
+```
+
+Important assumption: this helper rotates velocity about the current radius vector. For a physically meaningful pure
+plane change, the burn state should usually be at a node where the old and new orbital planes intersect.
 
 ---
 
 ## Hohmann Transfer
 
-The toolbox includes a Hohmann transfer module for computing and validating two-impulse transfers between circular, coplanar orbits.
+The toolbox includes a Hohmann transfer module for computing and validating two-impulse transfers between circular,
+coplanar orbits.
 
 ### Assumptions
 
@@ -336,52 +326,26 @@ The toolbox includes a Hohmann transfer module for computing and validating two-
 - Inputs `r1` and `r2` are scalar orbital radii measured from the central body center.
 - Inputs are radii, not altitudes.
 
----
-
 ### Method
 
 The transfer consists of two burns:
 
-1. Burn 1 at `r1`  
-   Tangential burn to enter the transfer ellipse.
+1. Burn 1 at `r1`: tangential burn to enter the transfer ellipse.
+2. Burn 2 at `r2`: tangential burn to circularize into the final orbit.
 
-2. Burn 2 at `r2`  
-   Tangential burn to circularize into the final orbit.
-
-For a raising transfer, both burns are prograde.  
-For a lowering transfer, both burns are retrograde.
-
----
+For a raising transfer, both burns are prograde. For a lowering transfer, both burns are retrograde.
 
 ### Hohmann Equations
 
-Circular velocity:
-
+```text
 v_c = sqrt(mu / r)
-
-Transfer orbit semi-major axis:
-
 a_t = (r1 + r2) / 2
-
-Transfer velocity from the vis-viva equation:
-
 v_t = sqrt(mu * (2/r - 1/a_t))
-
-Delta-v:
-
 dv1 = v_t(r1) - v_c(r1)
-
 dv2 = v_c(r2) - v_t(r2)
-
-Total delta-v:
-
 dv_total = |dv1| + |dv2|
-
-Transfer time:
-
 t_transfer = pi * sqrt(a_t^3 / mu)
-
----
+```
 
 ### Function Output
 
@@ -404,6 +368,7 @@ t_transfer = pi * sqrt(a_t^3 / mu)
 - `transfer_type`
 - `notes`
 
+---
 
 ## Orbital Elements Output
 
@@ -431,46 +396,30 @@ t_transfer = pi * sqrt(a_t^3 / mu)
 - `v_vec_asc`
 - `v_vec_des`
 
-When the nodes are undefined, the node-related outputs are set to `None`.
+When nodes are undefined, the node-related outputs are set to `None`.
 
 ---
 
-### Validation Approach
+## Validation Approach
 
-The transfer is validated using full propagation:
+The validation suite checks selected controlled cases for correctness and consistency. It is intended as a learning and
+development health check, not a complete proof of production-grade astrodynamics behavior.
 
-1. Start in circular orbit at `r1`.
-2. Apply first burn `dv1`.
-3. Propagate for the transfer time.
-4. Apply second burn `dv2`.
-5. Propagate the circularized final orbit.
+Current validation checks include:
 
-The following are checked:
+- COE to RV conversion
+- COE to RV to COE round trip
+- ascending and descending node states
+- RK4 one-orbit conservation
+- impulsive burn behavior
+- Hohmann transfer propagation and circularization
+- inclination-change speed preservation, delta-v magnitude, scalar check, and final inclination
 
-- Final transfer radius ≈ `r2`
-- Final semi-major axis ≈ `r2`
-- Final eccentricity ≈ 0
+`validation.py` can be run directly from the project root:
 
-Example result:
-
-PASS: Hohmann transfer validation successful.
-
----
-
-### Limitations
-
-- Only valid for circular, coplanar orbits.
-- Does not handle:
-  - elliptical initial or final orbits
-  - combined transfer and inclination-change optimization
-  - phasing or timing constraints
-  - finite burn durations
-  - perturbations
-
-- Not a general transfer solver.
-- Lambert solving is not yet implemented.
-- Ascending and descending node states are undefined for equatorial orbits because the node vector has zero magnitude. 
-For circular inclined orbits, the node direction is defined, but true anomaly relative to periapsis is convention-based because periapsis is undefined.
+```powershell
+python validation.py
+```
 
 ---
 
@@ -502,7 +451,7 @@ This makes downstream plotting, diagnostics, and validation more predictable.
 
 ## Plotting System
 
-The plotting module supports two main result types:
+The plotting module supports two main result types.
 
 ### Single-Orbit Plotting
 
@@ -537,29 +486,18 @@ These are used to show the central body and preserve accurate 3D visual scaling.
 
 ---
 
-## Validation System
+## Limitations
 
-The toolbox includes a validation runner:
+### Hohmann Transfer Limitations
 
-run_all_validations()
+- Only valid for circular, coplanar orbits.
+- Does not handle elliptical initial or final orbits.
+- Does not handle combined transfer and inclination-change optimization.
+- Does not handle phasing or timing constraints.
+- Does not handle finite burn durations.
+- Not a general transfer solver.
 
-Current validation checks include:
-
-- COE → RV conversion
-- COE → RV → COE round trip
-- RK4 one-orbit conservation
-- impulsive burn behavior
-- Hohmann transfer propagation and circularization
-
-`validation.py` can be run directly from the project root.
-
-On Windows PowerShell:
-
-```powershell
-py validation.py
-```
-
-## Limitations (Global)
+### Global Limitations
 
 - Two-body only
 - No perturbations
@@ -572,11 +510,15 @@ py validation.py
 - No target phasing yet
 - No time/date system yet
 
+Ascending and descending node states are undefined for equatorial orbits because the node vector has zero magnitude. For
+circular inclined orbits, the node direction is defined, but true anomaly relative to periapsis is convention-based
+because periapsis is undefined.
+
 ---
 
 ## Planned Extensions
 
-- Inclination-change validation and combined plane-change transfer tools
+- Combined plane-change transfer tools
 - Bi-elliptic transfers
 - J2 perturbation modeling
 - Atmospheric drag
